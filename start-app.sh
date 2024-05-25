@@ -1,6 +1,6 @@
 source venv/bin/activate
 #!/bin/bash
-# Path to your build script
-./build.sh
+echo "Installing requirements..."
+pip install -r requirements.txt
 # Starting the Django application with gunicorn
 exec python manage.py runserver 0.0.0.0:8000
