@@ -14,12 +14,10 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path
-from BacteraifyModel.load import load
-from BacteraifyModel.load import load
+from BacteraifyModel.load import load_and_predict
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('survey/load/', load, name='load-model'),
+    path('survey/load/', load_and_predict, name='load-model'),
 ]

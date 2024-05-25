@@ -59,10 +59,9 @@ def save_result_to_s3(data):
         return "AWS credentials not available or incorrect"
 
 def predict(data: pd.DataFrame, model_types: list):
-    file_names = []
+    file_names = {}
     model_types_len = len(model_types)
     for index, char in enumerate(model_types):
-        print("============================ char ======================", char)
         if char == "CNN":
             if hasattr(tf, "executing_eagerly_outside_functions"):
                 tf.compat.v1.executing_eagerly_outside_functions = (tf.executing_eagerly_outside_functions)
@@ -74,13 +73,11 @@ def predict(data: pd.DataFrame, model_types: list):
             y_pred = model.predict(data)
             logger.info("--------------------------- CNN MODEL Y_PRED ---------------------------")
             logger.info(y_pred)
-            print('y_pred --------------------------', y_pred)
 
-            file_names.append({ 'CNN': save_result_to_s3(pd.DataFrame(y_pred)) })
+            file_names["CNN"] = save_result_to_s3(pd.DataFrame(y_pred))
         elif char == "SVM":
             path = SVM_MODEL_FILE_PATH
             model = load(path)
-            print("======================== model ====================", model)
             X_test = data.values if isinstance(data, pd.DataFrame) else data
             logger.info("------------------------------ SVM MODEL ------------------------------")
             logger.info(model)
@@ -88,15 +85,14 @@ def predict(data: pd.DataFrame, model_types: list):
             y_pred_probabilities = model.predict_proba(X_test)
             logger.info("--------------------------- SVM MODEL Y_PRED ---------------------------")
             logger.info(y_pred)
-            print('y_pred_probabilities --------------------------', y_pred_probabilities)
-            file_names.append({ 'SVM': save_result_to_s3(pd.DataFrame(y_pred_probabilities)) })
+            file_names["SVM"] = save_result_to_s3(pd.DataFrame(y_pred_probabilities))
         else:
             logger.warning("Invalid model type")
 
     return file_names
 
 @csrf_exempt
-def load(request):
+def load_and_predict(request):
     try:
         try:
             body_data = json.loads(request.body)
@@ -116,7 +112,7 @@ def load(request):
         survey_file = fetch_file_from_s3(survey_fie_name)
         df = pd.read_csv(survey_file)
         result = predict(df, model_types)
-        return json.dump(result)
+        return JsonResponse({ 'prediction_result_file_names': result })
     except Exception as e:
         logger.error(e)
         return JsonResponse({'error': str(e)}, status=400)
