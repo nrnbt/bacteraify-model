@@ -1,0 +1,17 @@
+db.sqlite3
+__pycache__/
+staticfiles/
+
+#venv
+
+.env
+.env/
+.env.prod
+
+venv/
+pyvenv.cfg
+Lib/
+Scripts/
+Include/
+
+models/
