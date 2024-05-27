@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.urls import path
 from BacteraifyModel.load import load_and_predict
+from BacteraifyModel.train import train_model
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path('survey/load/', load_and_predict, name='load-model'),
+    path('model/train/', train_model, name='model-train'),
 ]
